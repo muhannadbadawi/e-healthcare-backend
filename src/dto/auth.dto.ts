@@ -35,4 +35,11 @@ export class RegisterDto {
 
   @IsIn(['male', 'female', 'other'])
   gender: string;
+
+  @IsIn(['client', 'admin', 'doctor'])
+  @IsString()
+  role: string;
+  constructor() {
+    this.role = 'client';
+  }
 }

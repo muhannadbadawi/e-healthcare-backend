@@ -12,27 +12,29 @@ export class AppService {
   ) {}
 
   // Fixing the login method
-  async login(email: string, password: string): Promise<string> {
+  async login(
+    email: string,
+    password: string,
+  ): Promise<string | { token: string }> {
     const user = await this.userModel.findOne({ email });
-
     if (!user) {
-      return 'User not found!';
+      return 'Invalid credentials!';
     }
 
     if (user.password !== password) {
       return 'Invalid credentials!';
     }
-
-    return this.signUser(user._id.toString(), user.email, 'User');
+    return { token: this.signUser(user._id.toString(), user.email, user.role) };
   }
 
   // Register method (unchanged)
-  async register(
+  async registerClient(
     email: string,
     password: string,
     name: string,
     age: number,
     gender: string,
+    role: string,
   ): Promise<User> {
     const existingUser = await this.userModel.findOne({ email });
 
@@ -40,16 +42,23 @@ export class AppService {
       throw new Error('Email already exists');
     }
 
-    const newUser = new this.userModel({ email, password, name, age, gender });
+    const newUser = new this.userModel({
+      email,
+      password,
+      name,
+      age,
+      gender,
+      role,
+    });
     return await newUser.save();
   }
 
   // Sign user to JWT (unchanged)
   signUser(userId: string, email: string, type: string): string {
     return this.jwtService.sign({
-      sub: userId,
+      id: userId,
       email,
-      claim: type,
+      role: type,
     });
   }
 }
