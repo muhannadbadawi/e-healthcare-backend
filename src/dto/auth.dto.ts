@@ -1,13 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 // auth.dto.ts
-import {
-  IsEmail,
-  IsString,
-  MinLength,
-  IsInt,
-  Min,
-  IsIn,
-} from 'class-validator';
+import { IsEmail, IsString, MinLength, Min, IsIn } from 'class-validator';
 
 export class LoginDto {
   @IsEmail()
@@ -19,6 +11,11 @@ export class LoginDto {
 }
 
 export class RegisterDto {
+  @IsString()
+  @MinLength(6)
+  name: string;
+
+  @IsString()
   @IsEmail()
   email: string;
 
@@ -27,19 +24,39 @@ export class RegisterDto {
   password: string;
 
   @IsString()
-  name: string;
-
-  @IsInt()
   @Min(0)
-  age: number;
+  age: string;
 
-  @IsIn(['male', 'female', 'other'])
+  @IsIn(['male', 'female'])
   gender: string;
+
+  @IsString()
+  @MinLength(6)
+  address: string;
+
+  @IsString()
+  height: string;
+
+  @IsString()
+  weight: string;
+
+  @IsString()
+  allergies: string;
+
+  @IsString()
+  @MinLength(16)
+  cardNumber: string;
+
+  @IsString()
+  cardName: string;
+
+  @IsString()
+  expiryDate: string;
+
+  @IsString()
+  cvv: string;
 
   @IsIn(['client', 'admin', 'doctor'])
   @IsString()
   role: string;
-  constructor() {
-    this.role = 'client';
-  }
 }
