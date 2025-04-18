@@ -1,14 +1,18 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { User, UserSchema } from './user.schema';
-import { Client, ClientSchema } from './client.schema';
+import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
+import { User, UserSchema } from './users/user.schema';
+import { Client, ClientSchema } from './client/client.schema';
+import { ClientModule } from './client/client.module';
 
 @Module({
   imports: [
+    AuthModule,
+    UsersModule,
+    ClientModule,
     ConfigModule.forRoot({
       isGlobal: true, // makes ConfigService available app-wide
     }),
@@ -35,7 +39,5 @@ import { Client, ClientSchema } from './client.schema';
       { name: Client.name, schema: ClientSchema },
     ]),
   ],
-  controllers: [AppController],
-  providers: [AppService],
 })
 export class AppModule {}

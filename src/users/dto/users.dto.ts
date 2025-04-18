@@ -1,5 +1,13 @@
-// auth.dto.ts
-import { IsEmail, IsString, MinLength, Min, IsIn } from 'class-validator';
+import {
+  IsEmail,
+  IsString,
+  IsInt,
+  Min,
+  MinLength,
+  MaxLength,
+  IsIn,
+  Length,
+} from 'class-validator';
 
 export class LoginDto {
   @IsEmail()
@@ -12,10 +20,9 @@ export class LoginDto {
 
 export class RegisterDto {
   @IsString()
-  @MinLength(6)
+  @MinLength(2)
   name: string;
 
-  @IsString()
   @IsEmail()
   email: string;
 
@@ -23,9 +30,9 @@ export class RegisterDto {
   @MinLength(6)
   password: string;
 
-  @IsString()
+  @IsInt()
   @Min(0)
-  age: string;
+  age: number;
 
   @IsIn(['male', 'female'])
   gender: string;
@@ -35,16 +42,17 @@ export class RegisterDto {
   address: string;
 
   @IsString()
-  height: string;
+  height: string; // or change to number if needed
 
   @IsString()
-  weight: string;
+  weight: string; // or change to number if needed
 
   @IsString()
   allergies: string;
 
   @IsString()
   @MinLength(16)
+  @MaxLength(16)
   cardNumber: string;
 
   @IsString()
@@ -54,9 +62,9 @@ export class RegisterDto {
   expiryDate: string;
 
   @IsString()
+  @Length(3, 4)
   cvv: string;
 
   @IsIn(['client', 'admin', 'doctor'])
-  @IsString()
   role: string;
 }
