@@ -18,4 +18,8 @@ export class ClientService {
   async findByEmail(email: string): Promise<Client | null> {
     return this.clientModel.findOne({ email });
   }
+
+  async getClientsCount() {
+    return this.clientModel.countDocuments();
+  }
 }

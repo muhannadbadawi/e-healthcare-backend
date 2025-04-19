@@ -7,21 +7,26 @@ import {
   Get,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { CreateClientDto } from '../client/dto/create-client.dto';
 import { LoginDto } from './dto/auth.dto';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
+import { CreateAdminDto } from 'src/admin/dto/create-admin.dto';
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() dto: CreateUserDto) {
+  async register(@Body() dto: CreateClientDto) {
     return this.authService.register(dto);
   }
 
-  // تسجيل الدخول
+  @Post('addAdmin')
+  async addAdmin(@Body() dto: CreateAdminDto) {
+    return this.authService.addAdmin(dto);
+  }
+
   @Post('login')
   async login(@Body() dto: LoginDto) {
     return this.authService.login(dto);

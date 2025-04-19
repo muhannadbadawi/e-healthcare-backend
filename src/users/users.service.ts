@@ -11,12 +11,16 @@ export class UsersService {
   ) {}
 
   // Ensure this method exists
-  async create(createUserDto: any): Promise<User> {
-    const user = new this.userModel(createUserDto);
+  async create(CreateClientDto: any): Promise<User> {
+    const user = new this.userModel(CreateClientDto);
     return user.save();
   }
 
   async findByEmail(email: string): Promise<User | null> {
     return this.userModel.findOne({ email });
+  }
+
+  async getUsersCount() {
+    return this.userModel.countDocuments();
   }
 }

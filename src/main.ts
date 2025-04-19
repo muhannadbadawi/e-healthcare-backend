@@ -1,7 +1,6 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ConfigService } from '@nestjs/config';
-
+import { NestFactory } from '@nestjs/core'; // NestFactory: Is a tool from NestJS to create our app
+import { AppModule } from './app.module'; // AppModule: It is the main module in the application, containing others modules and linking the rest of the modules to gother
+import { ConfigService } from '@nestjs/config'; // ConfigService: It's a service used to get configs value from configration files like ".env"
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);

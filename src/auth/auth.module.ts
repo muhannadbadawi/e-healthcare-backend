@@ -7,18 +7,20 @@ import { JwtStrategy } from './jwt.strategy';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ClientModule } from 'src/client/client.module';
+import { AdminModule } from 'src/admin/admin.module';
 
 @Module({
   imports: [
     UsersModule,
     ClientModule,
     ConfigModule,
+    AdminModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
-        signOptions: { expiresIn: '7d' }, // صلاحية التوكن
+        signOptions: { expiresIn: '7d' }, // token expire
       }),
     }),
   ],

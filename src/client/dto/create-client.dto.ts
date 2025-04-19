@@ -15,7 +15,7 @@ enum Gender {
   OTHER = 'other',
 }
 
-export class CreateUserDto {
+export class CreateClientDto {
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -27,10 +27,6 @@ export class CreateUserDto {
   @MinLength(6)
   @IsNotEmpty()
   password: string;
-
-  @MinLength(6)
-  @IsNotEmpty()
-  confirmPassword: string;
 
   @IsInt()
   @IsNotEmpty()

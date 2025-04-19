@@ -1,20 +1,34 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
-import { CreateUserDto } from '../users/dto/create-user.dto';
+import { CreateClientDto } from '../client/dto/create-client.dto';
 import { LoginDto } from './dto/auth.dto';
 import { UserDocument } from 'src/users/user.schema';
 import { ClientService } from 'src/client/client.service';
+import { CreateAdminDto } from 'src/admin/dto/create-admin.dto';
+import { AdminService } from 'src/admin/admin.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly clientService: ClientService,
+    private readonly adminService: AdminService,
     private readonly jwtService: JwtService,
   ) {}
 
-  async register(dto: CreateUserDto) {
+  async addAdmin(dto: CreateAdminDto) {
+    await this.usersService.create({
+      ...dto,
+      role: 'admin',
+    });
+
+    await this.adminService.create({
+      ...dto,
+    });
+  }
+
+  async register(dto: CreateClientDto) {
     await this.usersService.create({
       ...dto,
       role: 'client',
@@ -32,6 +46,7 @@ export class AuthService {
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const isMatch = dto.password === user.password;
+    console.log(isMatch);
     if (!isMatch) throw new UnauthorizedException('Invalid credentials');
 
     const userToGenerateToken = user as UserDocument;
@@ -43,6 +58,7 @@ export class AuthService {
     const payload = {
       sub: user._id,
       email: user.email,
+      name: user.name,
       role: user.role,
     };
 
@@ -50,8 +66,8 @@ export class AuthService {
       access_token: this.jwtService.sign(payload),
       user: {
         id: user._id,
+        name: user.name,
         email: user.email,
-        role: user.role,
       },
     };
   }

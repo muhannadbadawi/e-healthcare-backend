@@ -1,5 +1,7 @@
 src/
 ├── auth/  
+│ ├── dto/
+│ │ └── auth.dto.ts
 │ ├── auth.controller.ts
 │ ├── auth.service.ts
 │ ├── auth.module.ts
@@ -8,6 +10,8 @@ src/
 │ └── roles.decorator.ts
 │
 ├── users/  
+│ ├── dto/
+│ │ └── user.dto.ts
 │ ├── user.schema.ts
 │ ├── users.module.ts
 │ ├── users.service.ts
@@ -15,17 +19,24 @@ src/
 │ └── users.repository.ts
 │
 ├── admin/  
+│ ├── dto/
+│ │ └── create-admin.dto.ts
 │ ├── admin.controller.ts
 │ ├── admin.service.ts
+│ ├── admin.schema.ts
 │ └── admin.module.ts
 │
-├── doctor/  
-│ ├── client.schema.ts
+├── doctor/
+│ ├── dto/
+│ │ └── create-doctor.dto.ts  
+│ ├── doctor.schema.ts
 │ ├── doctor.controller.ts
 │ ├── doctor.service.ts
 │ └── doctor.module.ts
 │
 ├── client/  
+│ ├── dto/
+│ │ └── create-client.dto.ts
 │ ├── client.schema.ts
 │ ├── client.controller.ts
 │ ├── client.service.ts
