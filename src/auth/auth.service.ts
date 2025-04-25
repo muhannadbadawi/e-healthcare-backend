@@ -42,11 +42,9 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.usersService.findByEmail(dto.email);
-    console.log(user);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const isMatch = dto.password === user.password;
-    console.log(isMatch);
     if (!isMatch) throw new UnauthorizedException('Invalid credentials');
 
     const userToGenerateToken = user as UserDocument;

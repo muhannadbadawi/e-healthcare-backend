@@ -11,8 +11,8 @@ export class UsersService {
   ) {}
 
   // Ensure this method exists
-  async create(CreateClientDto: any): Promise<User> {
-    const user = new this.userModel(CreateClientDto);
+  async create(CreateUserDto: any): Promise<User> {
+    const user = new this.userModel(CreateUserDto);
     return user.save();
   }
 

@@ -1,19 +1,4 @@
-import {
-  IsEmail,
-  MinLength,
-  IsString,
-  IsOptional,
-  IsEnum,
-  IsInt,
-  IsNotEmpty,
-  Matches,
-} from 'class-validator';
-
-enum Gender {
-  MALE = 'male',
-  FEMALE = 'female',
-  OTHER = 'other',
-}
+import { IsEmail, MinLength, IsString, IsNotEmpty } from 'class-validator';
 
 export class CreateAdminDto {
   @IsString()
