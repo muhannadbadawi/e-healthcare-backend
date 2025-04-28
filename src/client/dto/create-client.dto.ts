@@ -18,23 +18,23 @@ enum Gender {
 export class CreateClientDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name?: string;
 
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  email?: string;
 
   @MinLength(6)
   @IsNotEmpty()
-  password: string;
+  password?: string;
 
   @IsInt()
   @IsNotEmpty()
-  age: number;
+  age?: number;
 
   @IsEnum(Gender)
   @IsNotEmpty()
-  gender: Gender;
+  gender?: Gender;
 
   @IsString()
   @IsOptional()
@@ -54,23 +54,23 @@ export class CreateClientDto {
 
   @IsString()
   @IsNotEmpty()
-  cardName: string;
+  cardName?: string;
 
   @Matches(/^\d{16}$/, {
     message: 'Card number must be exactly 16 digits',
   })
   @IsNotEmpty()
-  cardNumber: string;
+  cardNumber?: string;
 
   @Matches(/^\d{2}\/\d{4}$/, {
     message: 'Expiry date must be in the format MM/YYYY',
   })
   @IsNotEmpty()
-  expiryDate: string;
+  expiryDate?: string;
 
   @Matches(/^\d{3}$/, {
     message: 'CVV must be exactly 3 digits',
   })
   @IsNotEmpty()
-  cvv: string;
+  cvv?: string;
 }

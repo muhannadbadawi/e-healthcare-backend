@@ -6,40 +6,40 @@ export type ClientDocument = Client & Document;
 @Schema()
 export class Client {
   @Prop({ required: true })
-  name: string;
+  name?: string;
 
   @Prop({ required: true, unique: true })
-  email: string;
+  email?: string;
 
   @Prop()
-  age: string;
+  age?: string;
 
   @Prop()
-  gender: string;
+  gender?: string;
 
   @Prop()
-  address: string;
+  address?: string;
 
   @Prop()
-  height: string;
+  height?: string;
 
   @Prop()
-  weight: string;
+  weight?: string;
 
   @Prop()
-  allergies: string;
+  allergies?: string;
 
   @Prop()
-  cardName: string;
+  cardName?: string;
 
   @Prop()
-  cardNumber: string;
+  cardNumber?: string;
 
   @Prop()
-  expiryDate: string;
+  expiryDate?: string;
 
   @Prop()
-  cvv: string;
+  cvv?: string;
 }
 
 export const ClientSchema = SchemaFactory.createForClass(Client);

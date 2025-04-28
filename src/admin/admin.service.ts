@@ -54,7 +54,61 @@ export class AdminService {
     });
   }
 
+  async editDoctor(id: string, updateDoctorDto: CreateDoctorDto) {
+    const doctor = await this.doctorService.getDoctorById(id);
+
+    if (!doctor) {
+      throw new Error('Doctor not found');
+    }
+
+    // Update doctor fields (partial update)
+    const updatedDoctor = await this.doctorService.updateDoctor(
+      id,
+      updateDoctorDto,
+    );
+
+    return updatedDoctor;
+  }
+
+  async deleteDoctor(id: string) {
+    const doctor = await this.doctorService.getDoctorById(id);
+
+    if (!doctor) {
+      throw new Error('Doctor not found');
+    }
+
+    // Optionally: Delete associated user too (if needed)
+    if (doctor.email) {
+      await this.usersService.deleteByEmail(doctor.email); // if your user is linked by email
+    } else {
+      throw new Error('Doctor email is undefined');
+    }
+
+    return await this.doctorService.deleteDoctor(id);
+  }
+
+  async deleteClient(id: string) {
+    const client = await this.clientService.getClientById(id);
+
+    if (!client) {
+      throw new Error('Doctor not found');
+    }
+
+    // Optionally: Delete associated user too (if needed)
+    if (client.email) {
+      await this.usersService.deleteByEmail(client.email); // if your user is linked by email
+    } else {
+      throw new Error('Client email is undefined');
+    }
+
+    return await this.clientService.deleteClient(id);
+  }
+
   async getDoctors() {
     return this.doctorService.getDoctors();
+  }
+
+  async getClients() {
+    return this.clientService.getClients();
   }
 }

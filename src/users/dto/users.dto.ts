@@ -11,60 +11,60 @@ import {
 
 export class LoginDto {
   @IsEmail()
-  email: string;
+  email?: string;
 
   @IsString()
   @MinLength(6)
-  password: string;
+  password?: string;
 }
 
 export class RegisterDto {
   @IsString()
   @MinLength(2)
-  name: string;
+  name?: string;
 
   @IsEmail()
-  email: string;
+  email?: string;
 
   @IsString()
   @MinLength(6)
-  password: string;
+  password?: string;
 
   @IsInt()
   @Min(0)
-  age: number;
+  age?: number;
 
   @IsIn(['male', 'female'])
-  gender: string;
+  gender?: string;
 
   @IsString()
   @MinLength(6)
-  address: string;
+  address?: string;
 
   @IsString()
-  height: string; // or change to number if needed
+  height?: string; // or change to number if needed
 
   @IsString()
-  weight: string; // or change to number if needed
+  weight?: string; // or change to number if needed
 
   @IsString()
-  allergies: string;
+  allergies?: string;
 
   @IsString()
   @MinLength(16)
   @MaxLength(16)
-  cardNumber: string;
+  cardNumber?: string;
 
   @IsString()
-  cardName: string;
+  cardName?: string;
 
   @IsString()
-  expiryDate: string;
+  expiryDate?: string;
 
   @IsString()
   @Length(3, 4)
-  cvv: string;
+  cvv?: string;
 
   @IsIn(['client', 'admin', 'doctor'])
-  role: string;
+  role?: string;
 }

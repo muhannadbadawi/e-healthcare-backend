@@ -20,6 +20,11 @@ export class UsersService {
     return this.userModel.findOne({ email });
   }
 
+  async deleteByEmail(email: string): Promise<{ deleted: boolean }> {
+    const result = await this.userModel.deleteOne({ email }).exec();
+    return { deleted: result.deletedCount > 0 };
+  }
+
   async getUsersCount() {
     return this.userModel.countDocuments();
   }

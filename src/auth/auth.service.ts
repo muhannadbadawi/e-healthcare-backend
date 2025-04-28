@@ -41,6 +41,9 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
+    if (!dto.email) {
+      throw new UnauthorizedException('Email is required');
+    }
     const user = await this.usersService.findByEmail(dto.email);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 

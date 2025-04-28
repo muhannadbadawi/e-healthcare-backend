@@ -6,8 +6,6 @@ src/
 │ ├── auth.service.ts
 │ ├── auth.module.ts
 │ ├── jwt.strategy.ts
-│ ├── roles.guard.ts
-│ └── roles.decorator.ts
 │
 ├── users/  
 │ ├── dto/
@@ -15,7 +13,6 @@ src/
 │ ├── user.schema.ts
 │ ├── users.module.ts
 │ ├── users.service.ts
-│ ├── users.entity.ts
 │ └── users.repository.ts
 │
 ├── admin/  

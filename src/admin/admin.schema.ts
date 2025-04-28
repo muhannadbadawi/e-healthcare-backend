@@ -6,10 +6,10 @@ export type AdminDocument = Admin & Document;
 @Schema()
 export class Admin {
   @Prop({ required: true })
-  name: string;
+  name?: string;
 
   @Prop({ required: true, unique: true })
-  email: string;
+  email?: string;
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin);

@@ -17,23 +17,23 @@ enum Gender {
 export class CreateDoctorDto {
   @IsString()
   @IsNotEmpty()
-  name: string;
+  name?: string;
 
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  email?: string;
 
   @MinLength(6)
   @IsNotEmpty()
-  password: string;
+  password?: string;
 
   @IsInt()
   @IsNotEmpty()
-  age: number;
+  age?: number;
 
   @IsEnum(Gender)
   @IsNotEmpty()
-  gender: Gender;
+  gender?: Gender;
 
   @IsString()
   @IsOptional()
@@ -41,5 +41,5 @@ export class CreateDoctorDto {
 
   @IsNotEmpty()
   @IsString()
-  specialty: string;
+  specialty?: string;
 }

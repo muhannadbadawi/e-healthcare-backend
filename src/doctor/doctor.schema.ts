@@ -6,25 +6,25 @@ export type DoctorDocument = Doctor & Document;
 @Schema()
 export class Doctor {
   @Prop({ required: true })
-  name: string;
+  name?: string;
 
   @Prop({ required: true, unique: true })
-  email: string;
+  email?: string;
 
   @Prop()
-  age: string;
+  age?: string;
 
   @Prop()
-  gender: string;
+  gender?: string;
 
   @Prop()
-  address: string;
+  address?: string;
 
   @Prop()
-  specialty: string;
+  specialty?: string;
 
   @Prop()
-  rate: number;
+  rate?: number;
 }
 
 export const DoctorSchema = SchemaFactory.createForClass(Doctor);
