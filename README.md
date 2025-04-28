@@ -96,3 +96,65 @@ Nest is an MIT-licensed open source project. It can grow thanks to the sponsors 
 ## License
 
 Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+
+```
+e-healthcare-backend
+├─ .prettierrc
+├─ eslint.config.mjs
+├─ nest-cli.json
+├─ package-lock.json
+├─ package.json
+├─ README.md
+├─ src
+│  ├─ admin
+│  │  ├─ admin.controller.ts
+│  │  ├─ admin.module.ts
+│  │  ├─ admin.schema.ts
+│  │  ├─ admin.service.ts
+│  │  └─ dto
+│  │     └─ create-admin.dto.ts
+│  ├─ app.module.ts
+│  ├─ auth
+│  │  ├─ auth.controller.ts
+│  │  ├─ auth.module.ts
+│  │  ├─ auth.service.ts
+│  │  ├─ dto
+│  │  │  └─ auth.dto.ts
+│  │  └─ jwt.strategy.ts
+│  ├─ client
+│  │  ├─ client.controller.ts
+│  │  ├─ client.module.ts
+│  │  ├─ client.schema.ts
+│  │  ├─ client.service.ts
+│  │  └─ dto
+│  │     └─ create-client.dto.ts
+│  ├─ common
+│  │  ├─ constants.ts
+│  │  ├─ decorators
+│  │  │  └─ roles.decorator.ts
+│  │  └─ guards
+│  │     └─ roles.guard.ts
+│  ├─ doctor
+│  │  ├─ doctor.controller.ts
+│  │  ├─ doctor.module.ts
+│  │  ├─ doctor.schema.ts
+│  │  ├─ doctor.service.ts
+│  │  └─ dto
+│  │     └─ create-doctor.dto.ts
+│  ├─ main.ts
+│  ├─ socket
+│  │  ├─ socket.gateway.ts
+│  │  ├─ socket.module.ts
+│  │  └─ socket.service.ts
+│  └─ users
+│     ├─ dto
+│     │  └─ users.dto.ts
+│     ├─ user.schema.ts
+│     ├─ users.module.ts
+│     ├─ users.repository.ts
+│     └─ users.service.ts
+├─ structure.md
+├─ tsconfig.build.json
+└─ tsconfig.json
+
+```
