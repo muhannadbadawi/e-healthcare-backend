@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type AdminDocument = Admin & Document;
 
@@ -10,6 +10,9 @@ export class Admin {
 
   @Prop({ required: true, unique: true })
   email?: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  userId!: Types.ObjectId; // Hooray! Added userId to link Admin with User
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin);

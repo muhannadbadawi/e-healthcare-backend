@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Admin } from './admin.schema';
+import { Admin, AdminDocument } from './admin.schema';
 import { UsersService } from 'src/users/users.service';
 import { ClientService } from 'src/client/client.service';
 import { DoctorService } from 'src/doctor/doctor.service';
 import { CreateDoctorDto } from 'src/doctor/dto/create-doctor.dto';
+import { UserDocument } from 'src/users/user.schema';
 
 @Injectable()
 export class AdminService {
@@ -20,7 +21,7 @@ export class AdminService {
     return this.adminModel.countDocuments();
   }
 
-  async create(createAdminDto: any): Promise<Admin> {
+  async create(createAdminDto: any): Promise<AdminDocument> {
     const admin = new this.adminModel(createAdminDto);
     return admin.save();
   }
@@ -43,13 +44,12 @@ export class AdminService {
     };
   }
 
+  // عند إنشاء الدكتور:
   async addDoctor(newDoctor: CreateDoctorDto) {
-    await this.usersService.create({
-      ...newDoctor,
-      role: 'doctor',
-    });
+    const user = await this.usersService.create({ ...newDoctor, role: 'doctor' }) as UserDocument;
     await this.doctorService.create({
       ...newDoctor,
+      userId: user._id,
       rate: 0.0,
     });
   }

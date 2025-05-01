@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type ClientDocument = Client & Document;
 
@@ -40,6 +40,9 @@ export class Client {
 
   @Prop()
   cvv?: string;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  userId!: Types.ObjectId; // Added userId to link Client with User
 }
 
 export const ClientSchema = SchemaFactory.createForClass(Client);

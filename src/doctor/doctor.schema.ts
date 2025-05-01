@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 export type DoctorDocument = Doctor & Document;
 
@@ -25,6 +25,9 @@ export class Doctor {
 
   @Prop()
   rate?: number;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', required: true })
+  userId!: Types.ObjectId; // Added userId to link Doctor with User
 }
 
 export const DoctorSchema = SchemaFactory.createForClass(Doctor);

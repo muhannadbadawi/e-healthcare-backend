@@ -18,24 +18,20 @@ export class AuthService {
   ) {}
 
   async addAdmin(dto: CreateAdminDto) {
-    await this.usersService.create({
-      ...dto,
-      role: 'admin',
-    });
+    const user = await this.usersService.create({ ...dto, role: 'admin' }) as UserDocument;
 
     await this.adminService.create({
       ...dto,
+      userId: user._id,
     });
   }
 
   async register(dto: CreateClientDto) {
-    await this.usersService.create({
-      ...dto,
-      role: 'client',
-    });
+    const user = await this.usersService.create({ ...dto, role: 'client' }) as UserDocument;
 
     await this.clientService.create({
       ...dto,
+      userId: user._id,
       role: 'client',
     });
   }
