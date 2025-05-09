@@ -1,46 +1,48 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Client } from './client.schema';
+import { Client, ClientDocument } from './client.schema';
 import { DoctorService } from 'src/doctor/doctor.service';
 
 @Injectable()
 export class ClientService {
   constructor(
-    @InjectModel(Client.name) private readonly clientModel: Model<Client>,
+    @InjectModel(Client.name) private readonly clientModel: Model<ClientDocument>,
     private readonly doctorService: DoctorService,
   ) {}
 
-  // Ensure this method exists
-  async create(createClientDto: any): Promise<Client> {
+  create(createClientDto: Partial<Client>): Promise<Client> {
     const client = new this.clientModel(createClientDto);
     return client.save();
   }
 
-  async findByEmail(email: string): Promise<Client | null> {
+  findByEmail(email: string): Promise<Client | null> {
     return this.clientModel.findOne({ email });
   }
 
-  async getClientById(id: string): Promise<Client | null> {
-    return this.clientModel.findById(id).exec(); // Ensure that findById is used to retrieve by ObjectId
+  async getClientById(id: string): Promise<Client> {
+    const client = await this.clientModel.findById(id);
+    if (!client) throw new NotFoundException(`Client with ID ${id} not found`);
+    return client;
   }
 
-  async getClientsCount() {
+  getClientsCount(): Promise<number> {
     return this.clientModel.countDocuments();
   }
 
-  async getClients() {
+  getClients(): Promise<Client[]> {
     return this.clientModel.find();
   }
 
-  async deleteClient(id: string) {
-    return await this.clientModel.findByIdAndDelete(id);
+  deleteClient(id: string): Promise<Client | null> {
+    return this.clientModel.findByIdAndDelete(id);
   }
-  async getDoctors() {
+
+  getDoctors(): ReturnType<DoctorService['getDoctors']> {
     return this.doctorService.getDoctors();
   }
 
-  async groupDoctorsBySpecialty() {
+  groupDoctorsBySpecialty(): ReturnType<DoctorService['groupDoctorsBySpecialty']> {
     return this.doctorService.groupDoctorsBySpecialty();
   }
 }

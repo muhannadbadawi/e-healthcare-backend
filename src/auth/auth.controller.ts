@@ -13,26 +13,26 @@ import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { CreateAdminDto } from 'src/admin/dto/create-admin.dto';
+
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  async register(@Body() dto: CreateClientDto) {
+  register(@Body() dto: CreateClientDto) {
     return this.authService.register(dto);
   }
 
   @Post('addAdmin')
-  async addAdmin(@Body() dto: CreateAdminDto) {
+  addAdmin(@Body() dto: CreateAdminDto) {
     return this.authService.addAdmin(dto);
   }
 
   @Post('login')
-  async login(@Body() dto: LoginDto) {
+  login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
   }
 
-  // مثال على راوت محمي باستخدام JWT فقط
   @UseGuards(AuthGuard('jwt'))
   @Get('me')
   getProfile(
@@ -41,7 +41,6 @@ export class AuthController {
     return req.user;
   }
 
-  // مثال على راوت محمي باستخدام JWT و Roles
   @UseGuards(AuthGuard('jwt'), RolesGuard)
   @Roles('admin')
   @Get('admin-only')

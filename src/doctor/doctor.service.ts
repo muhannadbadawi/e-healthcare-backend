@@ -1,81 +1,61 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Doctor } from './doctor.schema';
+import { Doctor, DoctorDocument } from './doctor.schema';
 import { CreateDoctorDto } from './dto/create-doctor.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class DoctorService {
   constructor(
-    @InjectModel(Doctor.name) private readonly doctorModel: Model<Doctor>,
+    @InjectModel(Doctor.name) private readonly doctorModel: Model<DoctorDocument>,
+    private readonly usersService: UsersService,
   ) {}
 
-  // Create a new doctor
-  async create(createDoctorDto: any): Promise<Doctor> {
+  async create(createDoctorDto: Partial<Doctor>): Promise<DoctorDocument> {
     const doctor = new this.doctorModel(createDoctorDto);
     return doctor.save();
   }
 
-  // Find a doctor by email
-  async findByEmail(email: string): Promise<Doctor | null> {
+  findByEmail(email: string): Promise<Doctor | null> {
     return this.doctorModel.findOne({ email });
   }
 
-  // Get all doctors
-  async getDoctors() {
+  getDoctors(): Promise<Doctor[]> {
     return this.doctorModel.find();
   }
 
-  // Get the count of doctors
-  async getDoctorsCount() {
+  getDoctorsCount(): Promise<number> {
     return this.doctorModel.countDocuments();
   }
 
-  // Get a doctor by ID
   async getDoctorById(id: string): Promise<Doctor | null> {
-    return this.doctorModel.findById(id).exec(); // Ensure that findById is used to retrieve by ObjectId
+    return this.doctorModel.findById(id).exec();
   }
 
-  // Update a doctor's information
-  async updateDoctor(
-    id: string,
-    updateDoctorDto: CreateDoctorDto,
-  ): Promise<Doctor> {
-    const updatedDoctor = await this.doctorModel
-      .findByIdAndUpdate(id, updateDoctorDto, { new: true })
-      .exec(); // { new: true } returns the updated document
+  async updateDoctor(id: string, updateDoctorDto: CreateDoctorDto): Promise<Doctor> {
+    const updatedDoctor = await this.doctorModel.findByIdAndUpdate(id, updateDoctorDto, { new: true });
+    if (!updatedDoctor?.email) throw new NotFoundException('Updated doctor or email not found');
 
-    if (!updatedDoctor) {
-      throw new Error(`Doctor with ID ${id} not found`);
-    }
+    const updatedUser = await this.usersService.updateUser(updatedDoctor.email, {
+      name: updateDoctorDto.name,
+      password: updateDoctorDto.password,
+      role: 'doctor',
+    });
+
+    if (!updatedUser) throw new NotFoundException('User not found');
 
     return updatedDoctor;
   }
 
-  async deleteDoctor(id: string) {
-    return await this.doctorModel.findByIdAndDelete(id);
+  deleteDoctor(id: string) {
+    return this.doctorModel.findByIdAndDelete(id);
   }
 
-  async groupDoctorsBySpecialty(): Promise<
-    { specialty: string; doctors: Doctor[] }[]
-  > {
-    const result: { specialty: string; doctors: Doctor[] }[] =
-      await this.doctorModel.aggregate([
-        {
-          $group: {
-            _id: '$specialty',
-            doctors: { $push: '$$ROOT' },
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            specialty: '$_id',
-            doctors: 1,
-          },
-        },
-      ]);
-
-    return result;
+  async groupDoctorsBySpecialty(): Promise<{ specialty: string; doctors: Doctor[] }[]> {
+    return this.doctorModel.aggregate([
+      { $group: { _id: '$specialty', doctors: { $push: '$$ROOT' } } },
+      { $project: { _id: 0, specialty: '$_id', doctors: 1 } },
+    ]);
   }
 }

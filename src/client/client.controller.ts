@@ -11,7 +11,7 @@ export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
   @Get('group-by-specialty')
-  async getDoctorsGroupedBySpecialty() {
+  getDoctorsGroupedBySpecialty() {
     return this.clientService.groupDoctorsBySpecialty();
   }
 }

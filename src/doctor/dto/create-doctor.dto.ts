@@ -29,7 +29,7 @@ export class CreateDoctorDto {
 
   @IsInt()
   @IsNotEmpty()
-  age?: number;
+  age?: string;
 
   @IsEnum(Gender)
   @IsNotEmpty()

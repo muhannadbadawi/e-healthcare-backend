@@ -23,9 +23,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const userId = client.handshake.query.userId as string;
     if (userId) {
       this.userSockets.set(userId, client.id);
+      client.data.userId = userId; // تخزين userId داخل socket
       console.log(`User ${userId} connected with socket ID ${client.id}`);
     }
   }
+  
 
   handleDisconnect(client: Socket) {
     for (const [userId, socketId] of this.userSockets.entries()) {
@@ -43,8 +45,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
   ): void {
     const recipientSocketId = this.userSockets.get(data.recipientId);
-    console.log("message: ", data.message);
-    console.log("recipientId: ", data.recipientId);
     if (recipientSocketId) {
       this.server.to(recipientSocketId).emit('message', {
         from: client.id,
@@ -52,6 +52,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       });
     }
   }
+
+  @SubscribeMessage('chatRequest')
+  handleChatRequest(
+    @MessageBody() data: { recipientId: string },
+    @ConnectedSocket() client: Socket,
+  ): void {
+    const recipientSocketId = this.userSockets.get(data.recipientId);
+    console.log("client.id: " + client.id);
+  
+    if (recipientSocketId) {
+      this.server.to(recipientSocketId).emit('chatRequest', {
+        from: client.data.userId, // إرسال userId الحقيقي بدل socket.id
+      });
+    }
+  }
+  
 
   @SubscribeMessage('join')
   handleJoin(

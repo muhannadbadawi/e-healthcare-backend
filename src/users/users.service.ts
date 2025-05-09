@@ -1,4 +1,3 @@
-// users.service.ts
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -6,17 +5,14 @@ import { User, UserDocument } from './user.schema';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectModel(User.name) private userModel: Model<UserDocument>,
-  ) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
-  // Ensure this method exists
-  async create(CreateUserDto: any): Promise<UserDocument> {
-    const user = new this.userModel(CreateUserDto);
+  create(createUserDto: Partial<User>): Promise<UserDocument> {
+    const user = new this.userModel(createUserDto);
     return user.save();
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  findByEmail(email: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ email });
   }
 
@@ -25,7 +21,11 @@ export class UsersService {
     return { deleted: result.deletedCount > 0 };
   }
 
-  async getUsersCount() {
+  updateUser(email: string, updateUserDto: Partial<UserDocument>): Promise<UserDocument | null> {
+    return this.userModel.findOneAndUpdate({ email }, updateUserDto, { new: true });
+  }
+
+  getUsersCount(): Promise<number> {
     return this.userModel.countDocuments();
   }
 }

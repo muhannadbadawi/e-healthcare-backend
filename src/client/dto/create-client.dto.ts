@@ -30,7 +30,7 @@ export class CreateClientDto {
 
   @IsInt()
   @IsNotEmpty()
-  age?: number;
+  age?: string;
 
   @IsEnum(Gender)
   @IsNotEmpty()
@@ -42,11 +42,11 @@ export class CreateClientDto {
 
   @IsInt()
   @IsOptional()
-  height?: number;
+  height?: string;
 
   @IsInt()
   @IsOptional()
-  weight?: number;
+  weight?: string;
 
   @IsString()
   @IsOptional()
