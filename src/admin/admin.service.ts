@@ -48,6 +48,7 @@ export class AdminService {
     await this.doctorService.create({
       ...newDoctor,
       userId: user._id,
+      sessionPrice: newDoctor.sessionPrice ?? 0,
       rate: 0.0,
     });
   }

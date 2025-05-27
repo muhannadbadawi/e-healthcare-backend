@@ -28,6 +28,9 @@ export class Doctor {
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId!: Types.ObjectId; // Added userId to link Doctor with User
+
+  @Prop({ type: Number, default: 0 }) // Default session price set to 0
+  sessionPrice?: number;
 }
 
 export const DoctorSchema = SchemaFactory.createForClass(Doctor);

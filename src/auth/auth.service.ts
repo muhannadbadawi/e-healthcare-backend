@@ -38,6 +38,7 @@ export class AuthService {
     await this.clientService.create({
       ...dto,
       userId: user._id,
+      balance: 0,
     });
   }
 

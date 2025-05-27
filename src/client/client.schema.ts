@@ -43,6 +43,9 @@ export class Client {
 
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId!: Types.ObjectId; // Added userId to link Client with User
+
+  @Prop({ type: Number, default: 0 }) // Default balance set to 0
+  balance?: number;
 }
 
 export const ClientSchema = SchemaFactory.createForClass(Client);

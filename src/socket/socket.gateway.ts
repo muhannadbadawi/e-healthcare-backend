@@ -8,7 +8,7 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-// import { ClientService } from 'src/client/client.service';
+import { UsersService } from 'src/users/users.service';
 
 @WebSocketGateway({
   cors: {
@@ -16,11 +16,10 @@ import { Server, Socket } from 'socket.io';
   },
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  // constructor(private readonly clientService: ClientService) {}
-
   @WebSocketServer() server!: Server;
 
-  private userSockets = new Map<string, string>(); // userId -> socketId
+  private userSockets = new Map<string, string>();
+  constructor(private readonly usersService: UsersService) {}
 
   handleConnection(client: Socket) {
     const userId = client.handshake.query.userId as string;
@@ -28,7 +27,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.userSockets.set(userId, client.id);
       client.data.userId = userId;
 
-      // بث أن هذا الطبيب أصبح "online"
       this.server.emit('doctorStatusUpdate', {
         doctorId: userId,
         status: 'online',
@@ -81,15 +79,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('chatRequest')
-  handleChatRequest(
+  async handleChatRequest(
     @MessageBody() data: { recipientId: string; requestType: string },
     @ConnectedSocket() client: Socket,
-  ): void {
+  ): Promise<void> {
     const recipientSocketId = this.userSockets.get(data.recipientId);
-    // const clientData = this.clientService.getClientById(client.data.userId);
+    const recipientUser = await this.usersService.findById(client.data.userId);
+
     if (recipientSocketId) {
       this.server.to(recipientSocketId).emit('chatRequest', {
         from: client.data.userId,
+        name: recipientUser?.name,
         requestType: data.requestType,
       });
     }
@@ -130,6 +130,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('getOnlineUsers')
   handleGetOnlineUsers(@ConnectedSocket() client: Socket) {
     const onlineUserIds = Array.from(this.userSockets.keys());
-    client.emit('onlineUsers', onlineUserIds); // رد على العميل فقط
+    client.emit('onlineUsers', onlineUserIds);
   }
 }

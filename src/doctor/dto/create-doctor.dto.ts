@@ -42,4 +42,8 @@ export class CreateDoctorDto {
   @IsNotEmpty()
   @IsString()
   specialty?: string;
+
+  @IsInt()
+  @IsNotEmpty()
+  sessionPrice?: number;
 }

@@ -11,7 +11,11 @@ export class UsersService {
     const user = new this.userModel(createUserDto);
     return user.save();
   }
-
+  
+  findById(id: string): Promise<UserDocument | null> {
+    return this.userModel.findById(id).exec();
+  }
+  
   findByEmail(email: string): Promise<UserDocument | null> {
     return this.userModel.findOne({ email });
   }
