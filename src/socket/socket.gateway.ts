@@ -18,13 +18,18 @@ import { UsersService } from 'src/users/users.service';
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server!: Server;
 
-  private userSockets = new Map<string, string>();
+  private userSockets = new Map<string, { socketId: string; status: string }>();
   constructor(private readonly usersService: UsersService) {}
 
   handleConnection(client: Socket) {
     const userId = client.handshake.query.userId as string;
+
     if (userId) {
-      this.userSockets.set(userId, client.id);
+      this.userSockets.set(userId, {
+        socketId: client.id,
+        status: 'online',
+      });
+
       client.data.userId = userId;
 
       this.server.emit('doctorStatusUpdate', {
@@ -37,11 +42,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket) {
-    for (const [userId, socketId] of this.userSockets.entries()) {
-      if (socketId === client.id) {
+    for (const [userId, userData] of this.userSockets.entries()) {
+      if (userData.socketId === client.id) {
         this.userSockets.delete(userId);
 
-        // بث أن هذا الطبيب أصبح "offline"
         this.server.emit('doctorStatusUpdate', {
           doctorId: userId,
           status: 'offline',
@@ -56,25 +60,47 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @SubscribeMessage('setBusy')
   handleSetBusy(@ConnectedSocket() client: Socket) {
     const userId = client.data.userId;
+
     if (userId) {
-      this.server.emit('doctorStatusUpdate', {
-        doctorId: userId,
-        status: 'busy',
-      });
-      console.log(`User ${userId} is now busy`);
+      const userData = this.userSockets.get(userId);
+
+      if (userData) {
+        this.userSockets.set(userId, {
+          ...userData,
+          status: 'busy',
+        });
+          console.log("busy: ");
+
+        this.server.emit('doctorStatusUpdate', {
+          doctorId: userId,
+          status: 'busy',
+        });
+
+        console.log(`User ${userId} is now busy`);
+      }
     }
   }
 
   @SubscribeMessage('setOnline')
   handleSetOnline(@ConnectedSocket() client: Socket) {
     const userId = client.data.userId;
-    console.log("setOnline userId: ", userId);
+
     if (userId) {
-      this.server.emit('doctorStatusUpdate', {
-        doctorId: userId,
-        status: 'online',
-      });
-      console.log(`User ${userId} is now online`);
+      const userData = this.userSockets.get(userId);
+
+      if (userData) {
+        this.userSockets.set(userId, {
+          ...userData,
+          status: 'online',
+        });
+
+        this.server.emit('doctorStatusUpdate', {
+          doctorId: userId,
+          status: 'online',
+        });
+
+        console.log(`User ${userId} is now online`);
+      }
     }
   }
 
@@ -83,11 +109,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { recipientId: string; requestType: string },
     @ConnectedSocket() client: Socket,
   ): Promise<void> {
-    const recipientSocketId = this.userSockets.get(data.recipientId);
+    const recipientSocket = this.userSockets.get(data.recipientId);
     const recipientUser = await this.usersService.findById(client.data.userId);
 
-    if (recipientSocketId) {
-      this.server.to(recipientSocketId).emit('chatRequest', {
+    if (recipientSocket) {
+      this.server.to(recipientSocket.socketId).emit('chatRequest', {
         from: client.data.userId,
         name: recipientUser?.name,
         requestType: data.requestType,
@@ -100,9 +126,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() data: { recipientId: string; message: string },
     @ConnectedSocket() client: Socket,
   ): void {
-    const recipientSocketId = this.userSockets.get(data.recipientId);
-    if (recipientSocketId) {
-      this.server.to(recipientSocketId).emit('message', {
+    const recipientSocket = this.userSockets.get(data.recipientId);
+    if (recipientSocket) {
+      this.server.to(recipientSocket.socketId).emit('message', {
         from: client.data.userId,
         message: data.message,
       });
@@ -129,7 +155,10 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('getOnlineUsers')
   handleGetOnlineUsers(@ConnectedSocket() client: Socket) {
-    const onlineUserIds = Array.from(this.userSockets.keys());
+    const onlineUserIds = Array.from(this.userSockets.entries())
+      .filter(([_, data]) => data.status === 'online')
+      .map(([userId]) => userId);
+
     client.emit('onlineUsers', onlineUserIds);
   }
 }

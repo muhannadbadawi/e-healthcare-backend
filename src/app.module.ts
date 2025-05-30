@@ -6,6 +6,7 @@ import { UsersModule } from './users/users.module';
 import { ClientModule } from './client/client.module';
 import { AdminModule } from './admin/admin.module';
 import { SocketModule } from './socket/socket.module';
+import { DoctorModule } from './doctor/doctor.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { SocketModule } from './socket/socket.module';
     UsersModule,
     ClientModule,
     SocketModule,
+    DoctorModule,
     AdminModule,
     ConfigModule.forRoot({
       isGlobal: true, // makes ConfigService available app-wide

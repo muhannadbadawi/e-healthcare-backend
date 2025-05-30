@@ -1,13 +1,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Client, ClientDocument } from './client.schema';
 import { DoctorService } from 'src/doctor/doctor.service';
 
 @Injectable()
 export class ClientService {
   constructor(
-    @InjectModel(Client.name) private readonly clientModel: Model<ClientDocument>,
+    @InjectModel(Client.name)
+    private readonly clientModel: Model<ClientDocument>,
     private readonly doctorService: DoctorService,
   ) {}
 
@@ -42,7 +43,31 @@ export class ClientService {
     return this.doctorService.getDoctors();
   }
 
-  groupDoctorsBySpecialty(): ReturnType<DoctorService['groupDoctorsBySpecialty']> {
+  groupDoctorsBySpecialty(): ReturnType<
+    DoctorService['groupDoctorsBySpecialty']
+  > {
     return this.doctorService.groupDoctorsBySpecialty();
+  }
+
+  async updateBalance(clientId: string, balance: number) {
+    const objectId = new Types.ObjectId(clientId); // 🔧 Convert string to ObjectId
+    const client = await this.clientModel.findOne({ userId: objectId });
+
+    if (!client) throw new NotFoundException('client not found');
+
+    client.balance = balance ;
+    await client.save();
+
+    return { message: 'Session price updated' };
+  }
+
+  async getBalance(clientId: string): Promise<{ balance: number }> {
+    const objectId = new Types.ObjectId(clientId); // 🔧 Convert string to ObjectId
+    const client = await this.clientModel.findOne({ userId: objectId });
+
+    if (!client) {
+      throw new NotFoundException('Client not found');
+    }
+    return { balance: client.balance || 0 };
   }
 }

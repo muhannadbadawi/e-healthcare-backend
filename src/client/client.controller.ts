@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
@@ -13,5 +13,20 @@ export class ClientController {
   @Get('group-by-specialty')
   getDoctorsGroupedBySpecialty() {
     return this.clientService.groupDoctorsBySpecialty();
+  }
+
+  @Get(':id/balance')
+  async getBalance(@Param('id') clientId: string) {
+    return this.clientService.getBalance(clientId);
+  }
+
+  // PATCH request updates only part of the data.
+  // PUT request updates the entire data.
+  @Patch(':id/balance')
+  async updateSessionPrice(
+    @Param('id') doctorId: string,
+    @Body('balance') balance: number,
+  ) {
+    return this.clientService.updateBalance(doctorId, balance);
   }
 }
