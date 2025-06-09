@@ -84,4 +84,21 @@ export class DoctorService {
       { $project: { _id: 0, specialty: '$_id', doctors: 1 } },
     ]);
   }
+
+  async rateDoctor(doctorId: string, rating: number) {
+    console.log("rating: ", rating);
+    console.log("doctorId: ", doctorId);
+    const objectId = new Types.ObjectId(doctorId); // 🔧 Convert string to ObjectId
+    const doctor = await this.doctorModel.findOne({ userId: objectId });
+
+    if (!doctor) throw new NotFoundException('Doctor not found');
+    if (rating < 1 || rating > 5) {
+      throw new Error('Rating must be between 1 and 5');
+    }
+    doctor.numberOfRatings = (doctor.numberOfRatings || 0) + 1;
+    doctor.rate =
+      ((doctor.rate || 0) + rating) /
+      doctor.numberOfRatings;
+    await doctor.save();
+  }
 }

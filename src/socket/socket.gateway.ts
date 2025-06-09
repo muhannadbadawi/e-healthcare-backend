@@ -69,7 +69,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
           ...userData,
           status: 'busy',
         });
-          console.log("busy: ");
+        console.log('busy: ');
 
         this.server.emit('doctorStatusUpdate', {
           doctorId: userId,
@@ -123,16 +123,21 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   @SubscribeMessage('privateMessage')
   handlePrivateMessage(
-    @MessageBody() data: { recipientId: string; message: string },
+    @MessageBody()
+    data: { recipientId: string; roomName: string; message: string },
     @ConnectedSocket() client: Socket,
   ): void {
     const recipientSocket = this.userSockets.get(data.recipientId);
+    const socketsInRoom = this.server.sockets.adapter.rooms.get(data.roomName);
+    let isRecipientInRoom = false;
     if (recipientSocket) {
+      isRecipientInRoom = socketsInRoom?.has(recipientSocket.socketId) ?? false;
       this.server.to(recipientSocket.socketId).emit('message', {
         from: client.data.userId,
         message: data.message,
       });
     }
+    console.log(`Is recipient in room? ${isRecipientInRoom}`);
   }
 
   @SubscribeMessage('join')
@@ -140,18 +145,36 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @MessageBody() room: string,
     @ConnectedSocket() client: Socket,
   ): void {
+    console.log('client: ', client.data.userId);
     client.join(room);
     console.log(`Client joined room: ${room}`);
   }
 
-  @SubscribeMessage('leave')
-  handleLeave(
-    @MessageBody() room: string,
-    @ConnectedSocket() client: Socket,
-  ): void {
-    client.leave(room);
-    console.log(`Client left room: ${room}`);
+@SubscribeMessage('leave')
+async handleLeave(
+  @MessageBody() payload: { roomName: string; seconds: number },
+  @ConnectedSocket() client: Socket,
+): Promise<void> {
+  const socketsInRoom = this.server.sockets.adapter.rooms.get(payload.roomName);
+
+  if (socketsInRoom) {
+    for (const socketId of socketsInRoom) {
+      if (socketId !== client.id) {
+        const otherSocket = this.server.sockets.sockets.get(socketId);
+        if (otherSocket) {
+          await otherSocket.leave(payload.roomName);
+          console.log(payload.seconds);
+          console.log(`Other client (${socketId}) also left room: ${payload.roomName}`);
+          otherSocket.emit('leftRoom', payload.roomName); 
+        }
+      }
+    }
   }
+
+  await client.leave(payload.roomName);
+  console.log(`Client (${client.id}) left room: ${payload.roomName}`);
+}
+
 
   @SubscribeMessage('getOnlineUsers')
   handleGetOnlineUsers(@ConnectedSocket() client: Socket) {

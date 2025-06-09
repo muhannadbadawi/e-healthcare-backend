@@ -26,6 +26,9 @@ export class Doctor {
   @Prop()
   rate?: number;
 
+  @Prop()
+  numberOfRatings?: number;
+
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
   userId!: Types.ObjectId; // Added userId to link Doctor with User
 

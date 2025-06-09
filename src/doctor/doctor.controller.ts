@@ -1,5 +1,5 @@
 import {
-    Body,
+  Body,
   Controller,
   Get,
   NotFoundException,
@@ -46,7 +46,7 @@ export class DoctorController {
     @Param('id') doctorId: string,
     @Body('sessionPrice') sessionPrice: number,
   ) {
-        console.log("sessionPrice: ", sessionPrice);
+    console.log('sessionPrice: ', sessionPrice);
 
     return this.doctorService.updateSessionPrice(doctorId, sessionPrice);
   }
