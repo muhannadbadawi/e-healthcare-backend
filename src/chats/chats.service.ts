@@ -1,17 +1,16 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Chats, ChatsDocument } from './chats.schema';
+import { Model } from 'mongoose';
 
 @Injectable()
 export class ChatsService {
-    // This service can be used to implement business logic related to chats.
-    // For example, methods to create, update, delete, or retrieve chat records
-    // can be added here in the future.
-    
-    // Currently, this service does not have any methods or properties.
-    // You can add methods as needed to interact with the ChatsRepository or other services.
+  constructor(
+    @InjectModel(Chats.name) private chatsModel: Model<ChatsDocument>,
+  ) {}
 
-    // saveChat(chatData: any): string {
-    //     // Placeholder method to simulate saving a chat
-    //     // In a real application, this would interact with the ChatsRepository to save the chat data
-    //     return "Chat saved successfully!";
-    // }
+  create(createUserDto: Partial<Chats>): Promise<ChatsDocument> {
+    const user = new this.chatsModel(createUserDto);
+    return user.save();
+  }
 }

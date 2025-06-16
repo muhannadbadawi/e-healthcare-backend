@@ -8,6 +8,7 @@ import {
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
+import { ChatsService } from 'src/chats/chats.service';
 import { UsersService } from 'src/users/users.service';
 
 @WebSocketGateway({
@@ -19,8 +20,30 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server!: Server;
 
   private userSockets = new Map<string, { socketId: string; status: string }>();
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly chatsService: ChatsService,
+  ) {}
 
+  async getUserBySocketId(
+    socketId: string,
+  ): Promise<
+    | { socketId: string; status: string; userId: string; role: string }
+    | undefined
+  > {
+    for (const [userId, userData] of this.userSockets.entries()) {
+      if (userData.socketId === socketId) {
+        const user = await this.usersService.findById(userId);
+        return {
+          socketId: userData.socketId,
+          status: userData.status,
+          userId: userId,
+          role: user?.role ?? '',
+        };
+      }
+    }
+    return undefined;
+  }
   handleConnection(client: Socket) {
     const userId = client.handshake.query.userId as string;
 
@@ -150,31 +173,45 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`Client joined room: ${room}`);
   }
 
-@SubscribeMessage('leave')
-async handleLeave(
-  @MessageBody() payload: { roomName: string; seconds: number },
-  @ConnectedSocket() client: Socket,
-): Promise<void> {
-  const socketsInRoom = this.server.sockets.adapter.rooms.get(payload.roomName);
-
-  if (socketsInRoom) {
-    for (const socketId of socketsInRoom) {
-      if (socketId !== client.id) {
-        const otherSocket = this.server.sockets.sockets.get(socketId);
-        if (otherSocket) {
-          await otherSocket.leave(payload.roomName);
-          console.log(payload.seconds);
-          console.log(`Other client (${socketId}) also left room: ${payload.roomName}`);
-          otherSocket.emit('leftRoom', payload.roomName); 
+  @SubscribeMessage('leave')
+  async handleLeave(
+    @MessageBody() payload: { roomName: string; seconds: number },
+    @ConnectedSocket() user: Socket,
+  ): Promise<void> {
+    const socketsInRoom = this.server.sockets.adapter.rooms.get(
+      payload.roomName,
+    );
+    let doctor;
+    let client;
+    if (socketsInRoom) {
+      for (const socketId of socketsInRoom) {
+        if (socketId !== user.id) {
+          const otherSocket = this.server.sockets.sockets.get(socketId);
+          if (otherSocket) {
+            await otherSocket.leave(payload.roomName);
+            otherSocket.emit('leftRoom', payload.roomName);
+          }
+        }
+        const targetUser = await this.getUserBySocketId(socketId);
+        if (targetUser?.role === 'doctor') {
+          doctor = targetUser;
+        } else {
+          client = targetUser;
         }
       }
+      const endAt = new Date();
+      const createdAt = new Date(endAt.getTime() - payload.seconds * 1000);
+
+      await this.chatsService.create({
+        clientId: client?.userId,
+        doctorId: doctor?.userId,
+        createdAt,
+        endAt,
+      });
     }
+
+    await user.leave(payload.roomName);
   }
-
-  await client.leave(payload.roomName);
-  console.log(`Client (${client.id}) left room: ${payload.roomName}`);
-}
-
 
   @SubscribeMessage('getOnlineUsers')
   handleGetOnlineUsers(@ConnectedSocket() client: Socket) {
