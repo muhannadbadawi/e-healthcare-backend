@@ -9,6 +9,8 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatsService } from 'src/chats/chats.service';
+import { ClientService } from 'src/client/client.service';
+import { DoctorService } from 'src/doctor/doctor.service';
 import { UsersService } from 'src/users/users.service';
 
 @WebSocketGateway({
@@ -23,6 +25,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private readonly usersService: UsersService,
     private readonly chatsService: ChatsService,
+    private readonly doctorService: DoctorService,
+    private readonly clientService: ClientService,
   ) {}
 
   async getUserBySocketId(
@@ -201,15 +205,35 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       const endAt = new Date();
       const createdAt = new Date(endAt.getTime() - payload.seconds * 1000);
+        console.log("doctor: ", doctor);
+        console.log("client: ", client);
 
-      await this.chatsService.create({
-        clientId: client?.userId,
-        doctorId: doctor?.userId,
-        createdAt,
-        endAt,
-      });
+      if (doctor && doctor.userId && client && client.userId) {
+        const targetDoctor = await this.doctorService.findByUserId(
+          doctor.userId,
+        );
+        const targetClient = await this.clientService.findByUserId(
+          client.userId,
+        );
+        console.log('targetClient: ', targetClient);
+        console.log('targetDoctor: ', targetDoctor);
+
+        if (targetDoctor && targetClient) {
+          await this.chatsService.create({
+            clientName: targetClient.name,
+            doctorName: targetDoctor.name,
+            doctorId: doctor.userId,
+            clientId: client.userId,
+            createdAt,
+            endAt,
+          });
+        } else {
+          console.warn(
+            'Doctor or Client not found in DB, chat record not created.',
+          );
+        }
+      }
     }
-
     await user.leave(payload.roomName);
   }
 

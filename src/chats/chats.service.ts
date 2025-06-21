@@ -15,10 +15,18 @@ export class ChatsService {
     return user.save();
   }
 
-  getByUserId(dto: GetHistoryByUserIdDto): Promise<ChatsDocument | null> {
-    if(dto.role === "doctor"){
-      return this.chatsModel.findOne({doctorId: dto.userId}).exec();
+  getByUserId(dto: GetHistoryByUserIdDto): Promise<ChatsDocument[]> {
+    if (dto.role === 'doctor') {
+      return this.chatsModel.find({ doctorId: dto.userId }).exec();
     }
-    return this.chatsModel.findOne({clientId: dto.userId}).exec();
+    return this.chatsModel.find({ clientId: dto.userId }).exec();
+  }
+
+  getAll(): Promise<ChatsDocument[]> {
+    return this.chatsModel.find().exec();
+  }
+
+  getChatsCount(): Promise<number> {
+    return this.chatsModel.countDocuments();
   }
 }

@@ -22,6 +22,11 @@ export class DoctorService {
     return this.doctorModel.findOne({ email });
   }
 
+  findByUserId(userId: string): Promise<Doctor | null> {
+    const objectId = new Types.ObjectId(userId);
+    return this.doctorModel.findOne({ userId: objectId });
+  }
+
   getDoctors(): Promise<Doctor[]> {
     return this.doctorModel.find();
   }
@@ -86,8 +91,6 @@ export class DoctorService {
   }
 
   async rateDoctor(doctorId: string, rating: number) {
-    console.log("rating: ", rating);
-    console.log("doctorId: ", doctorId);
     const objectId = new Types.ObjectId(doctorId); // 🔧 Convert string to ObjectId
     const doctor = await this.doctorModel.findOne({ userId: objectId });
 
@@ -95,10 +98,9 @@ export class DoctorService {
     if (rating < 1 || rating > 5) {
       throw new Error('Rating must be between 1 and 5');
     }
-    doctor.numberOfRatings = (doctor.numberOfRatings || 0) + 1;
-    doctor.rate =
-      ((doctor.rate || 0) + rating) /
-      doctor.numberOfRatings;
+    doctor.numberOfRatings = doctor.numberOfRatings ?? 0;
+    doctor.rate = ((doctor.rate || 0) * doctor.numberOfRatings + rating) / (doctor.numberOfRatings + 1);
+    doctor.numberOfRatings = doctor.numberOfRatings + 1;
     await doctor.save();
   }
 }

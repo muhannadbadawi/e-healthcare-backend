@@ -6,6 +6,7 @@ import { Admin, AdminSchema } from './admin.schema';
 import { UsersModule } from 'src/users/users.module';
 import { ClientModule } from 'src/client/client.module'; // Import ClientModule here
 import { DoctorModule } from 'src/doctor/doctor.module';
+import { ChatsModule } from 'src/chats/chats.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { DoctorModule } from 'src/doctor/doctor.module';
     UsersModule,
     ClientModule,
     DoctorModule,
+    ChatsModule
   ],
   controllers: [AdminController],
   providers: [AdminService],

@@ -59,4 +59,10 @@ export class AdminController {
   deleteClient(@Param('id') id: string) {
     return this.adminService.deleteClient(id);
   }
+
+  @Post('resetClientPassword')
+  resetClientPassword(@Body() body:{id: string}){
+    console.log("id: ", body.id);
+    this.adminService.resetClientPassword(body.id)
+  }
 }

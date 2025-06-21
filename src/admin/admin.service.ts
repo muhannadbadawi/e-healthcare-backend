@@ -8,6 +8,7 @@ import { DoctorService } from 'src/doctor/doctor.service';
 import { CreateDoctorDto } from 'src/doctor/dto/create-doctor.dto';
 import { UserDocument } from 'src/users/user.schema';
 import { UpdateAdminDto } from './dto/update-admindto';
+import { ChatsService } from 'src/chats/chats.service';
 
 @Injectable()
 export class AdminService {
@@ -16,6 +17,7 @@ export class AdminService {
     private readonly usersService: UsersService,
     private readonly clientService: ClientService,
     private readonly doctorService: DoctorService,
+    private readonly chatsService: ChatsService,
   ) {}
 
   async getAdminsCount(): Promise<number> {
@@ -37,6 +39,7 @@ export class AdminService {
       clientsCount: await this.clientService.getClientsCount(),
       usersCount: await this.usersService.getUsersCount(),
       doctorsCount: await this.doctorService.getDoctorsCount(),
+      chatsCount: await this.chatsService.getChatsCount(),
     };
   }
 
@@ -107,5 +110,27 @@ export class AdminService {
 
   getClients() {
     return this.clientService.getClients();
+  }
+
+  async resetClientPassword(id: string) {
+    const client = await this.clientService.findByUserId(id);
+    if (!client) {
+      throw new NotFoundException('Client not found');
+    }
+    const user = await this.usersService.findById(id);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const newPassword = user.email; 
+
+    if (!user.email) {
+      throw new NotFoundException('User email not found');
+    }
+    await this.usersService.updateUser(user.email, {
+      password: newPassword,
+    });
+
+    return { message: `Password reset successfully to ${newPassword}` };
   }
 }

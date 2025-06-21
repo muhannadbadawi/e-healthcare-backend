@@ -21,6 +21,11 @@ export class ClientService {
     return this.clientModel.findOne({ email });
   }
 
+  findByUserId(userId: string): Promise<Client | null> {
+    const objectId = new Types.ObjectId(userId);
+    return this.clientModel.findOne({ userId: objectId });
+  }
+
   async getClientById(id: string): Promise<Client> {
     const client = await this.clientModel.findById(id);
     if (!client) throw new NotFoundException(`Client with ID ${id} not found`);
@@ -70,4 +75,5 @@ export class ClientService {
     }
     return { balance: client.balance || 0 };
   }
+
 }
