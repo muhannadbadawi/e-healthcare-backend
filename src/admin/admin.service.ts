@@ -73,10 +73,14 @@ export class AdminService {
       { name: updateAdminDto.name },
       { new: true },
     );
+    console.log('updateAdminDto.newPassword: ', updateAdminDto.newPassword);
 
     await this.usersService.updateUser(admin.email, {
       name: updateAdminDto.name,
-      password: updateAdminDto.newPassword ?? user.password,
+      password:
+        updateAdminDto.newPassword && updateAdminDto.newPassword.length > 0
+          ? updateAdminDto.newPassword
+          : user.password,
     });
 
     return updatedAdmin;
@@ -122,7 +126,7 @@ export class AdminService {
       throw new NotFoundException('User not found');
     }
 
-    const newPassword = user.email; 
+    const newPassword = user.email;
 
     if (!user.email) {
       throw new NotFoundException('User email not found');
