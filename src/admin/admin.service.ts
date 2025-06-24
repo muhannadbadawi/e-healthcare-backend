@@ -73,7 +73,6 @@ export class AdminService {
       { name: updateAdminDto.name },
       { new: true },
     );
-    console.log('updateAdminDto.newPassword: ', updateAdminDto.newPassword);
 
     await this.usersService.updateUser(admin.email, {
       name: updateAdminDto.name,

@@ -22,7 +22,7 @@ export class DoctorController {
 
   @Get('getById/:id')
   getDoctorById(@Param('id') id: string) {
-    return this.doctorService.getDoctorById(id);
+    return this.doctorService.getDoctorByUserId(id);
   }
 
   @Get('sessionPrice')

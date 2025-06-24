@@ -3,6 +3,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Client, ClientDocument } from './client.schema';
 import { DoctorService } from 'src/doctor/doctor.service';
+import { CreateClientDto } from './dto/create-client.dto';
+import { UsersService } from 'src/users/users.service';
 
 @Injectable()
 export class ClientService {
@@ -10,6 +12,7 @@ export class ClientService {
     @InjectModel(Client.name)
     private readonly clientModel: Model<ClientDocument>,
     private readonly doctorService: DoctorService,
+    private readonly usersService: UsersService,
   ) {}
 
   create(createClientDto: Partial<Client>): Promise<Client> {
@@ -60,7 +63,7 @@ export class ClientService {
 
     if (!client) throw new NotFoundException('client not found');
 
-    client.balance = balance ;
+    client.balance = balance;
     await client.save();
 
     return { message: 'Session price updated' };
@@ -76,4 +79,37 @@ export class ClientService {
     return { balance: client.balance || 0 };
   }
 
+  async updateClient(
+    id: string,
+    updateClientDto: CreateClientDto,
+  ): Promise<Client> {
+    const objectId = new Types.ObjectId(id);
+
+    const client = await this.clientModel.findOne({ userId: objectId });
+    if (!client?.email)
+      throw new NotFoundException('Updated client or email not found');
+
+    const updatedUser = await this.usersService.updateUser(client.email, {
+      name: updateClientDto.name,
+      password: updateClientDto.password,
+      role: 'client',
+    });
+
+    if (!updatedUser) throw new NotFoundException('User not found');
+
+    client.name = updateClientDto.name;
+    client.age = updateClientDto.age;
+    client.gender = updateClientDto.gender;
+    client.address = updateClientDto.address;
+    client.height = updateClientDto.height;
+    client.weight = updateClientDto.weight;
+    client.allergies = updateClientDto.allergies;
+    client.cardName = updateClientDto.cardName;
+    client.cardNumber = updateClientDto.cardNumber;
+    client.expiryDate = updateClientDto.expiryDate;
+    client.cvv = updateClientDto.cvv;
+
+    await client.save();
+    return client;
+  }
 }
