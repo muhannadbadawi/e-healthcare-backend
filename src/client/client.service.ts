@@ -86,8 +86,17 @@ export class ClientService {
     const objectId = new Types.ObjectId(id);
 
     const client = await this.clientModel.findOne({ userId: objectId });
+    if (!updateClientDto.email) {
+      throw new NotFoundException('Email is required to update client');
+    }
+    const user = await this.usersService.findByEmail(updateClientDto.email);
+
     if (!client?.email)
       throw new NotFoundException('Updated client or email not found');
+
+    if(updateClientDto.password !== user?.password){
+      throw new NotFoundException('Password does not match');
+    }
 
     const updatedUser = await this.usersService.updateUser(client.email, {
       name: updateClientDto.name,
