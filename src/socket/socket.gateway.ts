@@ -12,6 +12,7 @@ import { ChatsService } from 'src/chats/chats.service';
 import { ClientService } from 'src/client/client.service';
 import { DoctorService } from 'src/doctor/doctor.service';
 import { UsersService } from 'src/users/users.service';
+type DoctorStatus = 'online' | 'offline' | 'busy';
 
 @WebSocketGateway({
   cors: {
@@ -205,8 +206,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
       const endAt = new Date();
       const createdAt = new Date(endAt.getTime() - payload.seconds * 1000);
-        console.log("doctor: ", doctor);
-        console.log("client: ", client);
+      console.log('doctor: ', doctor);
+      console.log('client: ', client);
 
       if (doctor && doctor.userId && client && client.userId) {
         const targetDoctor = await this.doctorService.findByUserId(
@@ -235,6 +236,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     }
     await user.leave(payload.roomName);
+  }
+
+  @SubscribeMessage('getDoctorStatuses')
+  async handleGetDoctorStatuses(@ConnectedSocket() client: Socket) {
+    const doctors = await this.doctorService.getDoctors();
+
+    const statuses = doctors.map((doc) => {
+      const statusData = this.userSockets.get(doc.userId.toString());
+      let status: DoctorStatus = 'offline';
+
+      if (statusData?.status === 'online') status = 'online';
+      else if (statusData?.status === 'busy') status = 'busy';
+
+      return {
+        doctorId: doc.userId.toString(),
+        name: doc.name,
+        specialty: doc.specialty,
+        status,
+      };
+    });
+
+    client.emit('allDoctorStatuses', statuses);
   }
 
   @SubscribeMessage('getOnlineUsers')
