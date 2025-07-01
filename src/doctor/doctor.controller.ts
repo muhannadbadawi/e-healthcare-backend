@@ -5,6 +5,7 @@ import {
   NotFoundException,
   Param,
   Patch,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -13,6 +14,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Roles } from '../common/decorators/roles.decorator';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { DoctorService } from './doctor.service';
+import { CreateDoctorDto } from './dto/create-doctor.dto';
 
 @UseGuards(AuthGuard('jwt'), RolesGuard)
 @Roles('doctor')
@@ -23,6 +25,11 @@ export class DoctorController {
   @Get('getById/:id')
   getDoctorById(@Param('id') id: string) {
     return this.doctorService.getDoctorByUserId(id);
+  }
+
+  @Put('editDoctor/:id')
+  editDoctor(@Param('id') id: string, @Body() dto: CreateDoctorDto) {
+    return this.doctorService.updateDoctor(id, dto);
   }
 
   @Get('sessionPrice')

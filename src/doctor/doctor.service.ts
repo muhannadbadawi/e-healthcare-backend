@@ -48,6 +48,8 @@ export class DoctorService {
     id: string,
     updateDoctorDto: CreateDoctorDto,
   ): Promise<Doctor> {
+    console.log('updateDoctorDto: ', updateDoctorDto);
+
     const updatedDoctor = await this.doctorModel.findByIdAndUpdate(
       id,
       updateDoctorDto,

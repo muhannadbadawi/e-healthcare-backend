@@ -269,3 +269,4 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.emit('onlineUsers', onlineUserIds);
   }
 }
+
